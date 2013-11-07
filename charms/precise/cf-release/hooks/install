@@ -11,13 +11,14 @@ modprobe quota_v1
 sed -i 's/mesg\ n/tty\ \-s\ \&\&\ mesg\ n/g' /root/.profile
 
 export HOME=/root
+export INSTALLER_URL=https://github.com/borovsky/cf_nise_installer.git
 export CF_RELEASE_URL=https://github.com/borovsky/cf-release
 export CF_RELEASE_BRANCH=integrate-services
 export CF_RELEASE_USE_HEAD=yes
 export NISE_IP_ADDRESS=`GET http://169.254.169.254/latest/meta-data/public-ipv4`
 
 cd /mnt
-bash < <(curl -s -k -B https://raw.github.com/yudai/cf_nise_installer/master/local/bootstrap.sh)
+bash < <(curl -s -k -B https://raw.github.com/borovsky/cf_nise_installer/master/local/bootstrap.sh)
 
 # launch cf on startup
 cp "$(dirname $0)/../files/cloudfoundry" /etc/init.d/cloudfoundry
