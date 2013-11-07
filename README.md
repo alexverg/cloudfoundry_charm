@@ -1,3 +1,10 @@
+# Release notes: 
+* This alpha release of Cloud Foundry Charm uses Nise BOSH until the next release of the Charm comes out without such dependency. Nise BOSH is one of the ways to make quick Cloud Foundry ‘devbox’ deployments, however its not recommended for production deployments.
+* The Charm utilizes CF Release version 147 (with a few compatibility patches), and runs on Ubuntu 10.04 Lucid Lynx. 
+* This release of the Charm relies on a particular custom deployment manifest. It will only install essential Cloud Foundry components. 
+* The Charm provides a single node CF deployment. It requires an instance with 8+ Gb of RAM and it can't expand to second machine out of the box (to enable clustered deployment make changes by hand).
+
+
 # Installation and configuration
 
 Follow the instructions on [JuJu getting started page](https://juju.ubuntu.com/docs/getting-started.html).
@@ -21,4 +28,4 @@ Navigate to your app source dir.
 
     cf push
 
-![](http://ad.retargeter.com/seg?add=1076364&t=2)
+
