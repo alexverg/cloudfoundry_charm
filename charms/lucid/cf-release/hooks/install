@@ -1,0 +1,19 @@
+#!/bin/bash
+# Here do anything needed to install the service
+# i.e. apt-get install -y foo  or  bzr branch http://myserver/mycode /srv/webroot
+# Make sure this hook exits cleanly and is idempotent, common problems here are failing to account for a debconf question on a dependency, or trying to pull from github without installing git first.
+
+apt-get install curl
+export CF_RELEASE_BRANCH=release-candidate
+export NISE_IP_ADDRESS=`GET http://169.254.169.254/latest/meta-data/public-ipv4`
+bash < <(curl -s -k -B https://raw.github.com/yudai/cf_nise_installer/master/local/bootstrap.sh)
+
+# Invokes the Monit process and CF processes
+./cf_nise_installer/common/start_processes.sh /etc/init.d/cloudfoundry
+
+# launch cf on startup
+cp ../files/cloudfoundry /etc/init.d/cloudfoundry
+chmod +x /etc/init.d/cloudfoundry
+update-rc.d cloudfoundry defaults 99
+
+open-port 80

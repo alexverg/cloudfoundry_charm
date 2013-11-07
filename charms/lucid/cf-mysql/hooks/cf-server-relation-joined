@@ -1,0 +1,12 @@
+#!/bin/bash
+# This must be renamed to the name of the relation. The goal here is to
+# affect any change needed by relationships being formed, modified, or broken
+# This script should be idempotent.
+
+set -ux
+
+MYSQL_ROOT_PASSWORD=`facter mysql-root-password`
+
+relation-set host=`hostname -f` user="root" password="${MYSQL_ROOT_PASSWORD}"
+
+exit 0

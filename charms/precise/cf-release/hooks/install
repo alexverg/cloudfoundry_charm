@@ -1,0 +1,27 @@
+#!/bin/bash
+# Here do anything needed to install the service
+# i.e. apt-get install -y foo  or  bzr branch http://myserver/mycode /srv/webroot
+# Make sure this hook exits cleanly and is idempotent, common problems here are failing to account for a debconf question on a dependency, or trying to pull from github without installing git first.
+set -exv
+
+apt-get install -y curl linux-image-extra-`uname -r` libwww-perl
+modprobe quota_v2
+modprobe quota_v1
+#export CF_RELEASE_BRANCH=release-candidate
+sed -i 's/mesg\ n/tty\ \-s\ \&\&\ mesg\ n/g' /root/.profile
+
+export HOME=/root
+export CF_RELEASE_URL=https://github.com/borovsky/cf-release
+export CF_RELEASE_BRANCH=integrate-services
+export CF_RELEASE_USE_HEAD=yes
+export NISE_IP_ADDRESS=`GET http://169.254.169.254/latest/meta-data/public-ipv4`
+
+cd /mnt
+bash < <(curl -s -k -B https://raw.github.com/yudai/cf_nise_installer/master/local/bootstrap.sh)
+
+# launch cf on startup
+cp "$(dirname $0)/../files/cloudfoundry" /etc/init.d/cloudfoundry
+chmod +x /etc/init.d/cloudfoundry
+update-rc.d cloudfoundry defaults 99
+
+open-port 80

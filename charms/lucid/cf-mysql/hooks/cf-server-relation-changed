@@ -1,0 +1,39 @@
+#!/bin/bash
+# This must be renamed to the name of the relation. The goal here is to
+# affect any change needed by relationships being formed, modified, or broken
+# This script should be idempotent.
+
+set -ux
+
+INSTALL_DIR='/opt/cloudfoundry-server/vcap'
+PATH=$PATH:/var/lib/gems/1.9.1/bin
+
+CF_SERVER_IP=`relation-get cf-server-ip`
+CF_SERVER_HOST=`relation-get cf-server-host`
+CF_NATS_USERNAME=`relation-get cf-nats-username`
+CF_NATS_PASSWORD=`relation-get cf-nats-password`
+CF_NATS_DEFAULT_PORT=`relation-get cf-nats-default-port`
+
+[ -z ${CF_SERVER_IP} ] && exit 0
+[ -z ${CF_SERVER_HOST} ] && exit 0
+[ -z ${CF_NATS_USERNAME} ] && exit 0
+[ -z ${CF_NATS_PASSWORD} ] && exit 0
+[ -z ${CF_NATS_DEFAULT_PORT} ] && exit 0
+
+MYSQL_ROOT_PASSWORD=`facter mysql-root-password`
+INSTALL_TIME=`facter install-time`
+
+mysql --user=root \
+      --password="${MYSQL_ROOT_PASSWORD}" \
+      --execute="revoke all privileges, grant option from 'root'@'${CF_SERVER_HOST}'"
+
+mysql --user=root \
+      --password="${MYSQL_ROOT_PASSWORD}" \
+      --execute="grant all privileges on *.* to 'root'@'${CF_SERVER_HOST}' identified by '${MYSQL_ROOT_PASSWORD}'"
+
+sed -i -e "s/^ip_route:.*/ip_route: ${CF_SERVER_IP}/" \
+       -e "s/^mbus:.*/mbus: nats:\/\/${CF_SERVER_IP}:${CF_NATS_DEFAULT_PORT}/" \
+       /opt/cloudfoundry-server/vcap/services/mysql/config/mysql_node.yml
+
+service cloudfoundry-server stop
+cd $INSTALL_DIR && bin/vcap start mysql

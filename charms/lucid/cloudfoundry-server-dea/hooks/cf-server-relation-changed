@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set -ux
+
+CF_SERVER=`relation-get cf-server-ip`
+
+[ -z ${CF_SERVER} ] && exit 0
+
+echo debconf cloudfoundry-server-dea/ip string ${CF_SERVER} | /usr/bin/debconf-set-selections
+
+DEBIAN_FRONTEND=noninteractive dpkg-reconfigure cloudfoundry-server-dea
+
+service cloudfoundry-server-dea stop
+
+sed -i -e "s/local_route:.*/local_route: ${CF_SERVER}/" /opt/cloudfoundry-server/vcap/dea/config/dea.yml
+sed -i -e "s/local_route:.*/local_route: ${CF_SERVER}/" /opt/cloudfoundry-server/vcap/dea/config/dea2.yml
+
+sleep 3
+
+service cloudfoundry-server-dea start

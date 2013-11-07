@@ -1,0 +1,15 @@
+ensemble: formula
+name: cloudfoundry-server-dea
+summary: "Cloud Foundry Server - DEA"
+description: |
+   Installs Cloud Foundry Server from VMWare providing the required database,
+   and the relation settings necessary to access it, and completes the
+   configuration of optional services and makes it available.
+   This formula provides the DEA for CloudFoundry
+requires:
+  cf-server:
+    interface: cf-server
+peers:
+  cf-dea-cluster:
+    interface: cf-dea
+

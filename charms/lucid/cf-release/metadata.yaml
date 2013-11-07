@@ -1,0 +1,10 @@
+name: cf-release
+summary: Full stack CloudFoundry release.
+maintainer: Altoros Systems, Inc. <pavel.pachkovskij@altoros.com>
+description: |
+  Cloud Foundry is an open platform as a service (PaaS), providing a choice of clouds,
+  developer frameworks and application services. Cloud Foundry makes it faster and
+  easier to build, test, deploy and scale applications.
+provides:
+  cf-release:
+    interface: cf-release

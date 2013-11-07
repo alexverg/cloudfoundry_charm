@@ -1,0 +1,19 @@
+#!/bin/bash
+# This must be renamed to the name of the relation. The goal here is to
+# affect any change needed by relationships being formed, modified, or broken
+# This script should be idempotent.
+
+set -ux
+
+CF_SERVER_IP=`relation-get cf-server-ip`
+CF_SERVER_HOST=`relation-get cf-server-host`
+CF_NATS_USERNAME=`relation-get cf-nats-username`
+CF_NATS_PASSWORD=`relation-get cf-nats-password`
+CF_NATS_DEFAULT_PORT=`relation-get cf-nats-default-port`
+MYSQL_ROOT_PASSWORD=`facter mysql-root-password`
+
+
+mysql --user=root \
+      --password="${MYSQL_ROOT_PASSWORD}" \
+      --execute="revoke all privileges, grant option from 'root'@'${CF_SERVER_HOST}'"
+
